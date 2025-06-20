@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/2c1a3905-510e-4e94-b542-142e2cd93fd4)# User-Level Thread Library (C Implementation)
+# User-Level Thread Library (C Implementation)
 
 ## Overview
 
@@ -23,21 +23,48 @@ All scheduling and context switches occur entirely in user space (no pthreads).
 ### How to Run (in Ubuntu or Docker)
 
 1. **Clone or copy all project files.**
+
 2. **Build:**
    ```sh
    gcc -Wall -Iinclude src/uthreads.c src/main.c -o uthreads_main
-To compile and run the demo with sleep:
-gcc -Wall -Iinclude src/uthreads.c src/uthreads.demo.c -o uthreads_demo
-Run:
-./uthreads_main
-If running in Docker
+   ```
+
+3. **Build (demo with sleep):**
+   ```sh
+   gcc -Wall -Iinclude src/uthreads.c src/uthreads.demo.c -o uthreads_demo
+   ```
+
+4. **Run:**
+   ```sh
+   ./uthreads_main
+   ```
+
+---
+
+## If Running in Docker
+
 Use an Ubuntu-based container:
+
+```sh
 docker run --rm -it -v "$PWD":/work -w /work ubuntu:22.04 bash
-apt update && apt install build-essential -y
+```
 
-API Comments & Documentation
-All public API functions are documented in uthreads.h:
+Then inside the container:
 
+```sh
+apt update
+apt install build-essential -y
+gcc -Wall -Iinclude src/uthreads.c src/main.c -o uthreads_main
+./uthreads_main
+```
+
+---
+
+## API Comments & Documentation
+
+All public API functions are documented in `uthreads.h`:
+
+```c
 // Initialize the user-thread system with preemptive scheduling
 int uthread_init(unsigned int quantum_ms);
 
@@ -49,11 +76,15 @@ void uthread_yield(void);
 
 // Terminate the calling thread
 void uthread_exit(void);
+```
 
-Each function in the implementation (uthreads.c) is also commented to explain its purpose and the main logic.
+Each function in the implementation (`uthreads.c`) is also commented to explain its purpose and the main logic.
 
-Sample Test Program
+---
 
+## Sample Test Program
+
+```c
 #include "uthreads.h"
 #include <stdio.h>
 
@@ -83,9 +114,15 @@ int main(void) {
 
     return 0;
 }
+```
 
-Expected Output
+---
+
+## Expected Output
+
 When running, you should see output similar to:
+
+```
 Thread 1: 0
 Thread 2: 0
 Thread 1: 1
@@ -96,31 +133,37 @@ Thread 1: 3
 Thread 2: 3
 Thread 1: 4
 Thread 2: 4
+```
+
+
+![image](https://github.com/user-attachments/assets/2c1a3905-510e-4e94-b542-142e2cd93fd4)
 
 This demonstrates correct context switching, with both threads alternating.
 
+---
 
-Results and Explanation
-Thread creation, scheduling, and preemption were demonstrated with two threads, each printing and yielding.
+## Results and Explanation
 
-The system preempts or switches threads after every quantum or explicit yield, showing round-robin scheduling.
+- Thread creation, scheduling, and preemption were demonstrated with two threads, each printing and yielding.
+- The system preempts or switches threads after every quantum or explicit yield, showing round-robin scheduling.
+- The code was built and run in Ubuntu (via Docker) to provide the correct POSIX environment.
+- All public functions are well-commented, and the core logic is documented in the code for clarity and reproducibility.
 
-The code was built and run in Ubuntu (via Docker) to provide the correct POSIX environment.
+---
 
-All public functions are well-commented, and the core logic is documented in the code for clarity and reproducibility.
+## Limitations & Assumptions
 
-Limitations & Assumptions
-Assumes a POSIX environment (ucontext.h is not available on Windows).
+- Assumes a POSIX environment (`ucontext.h` is not available on Windows).
+- No thread joining or synchronization primitives are implemented (for simplicity).
+- Each thread must eventually call `uthread_exit()` or return.
 
-No thread joining or synchronization primitives are implemented (for simplicity).
+---
 
-Each thread must eventually call uthread_exit() or return.
+## Submission Contents
 
-Submission Contents
-src/uthreads.c — Implementation
+- `src/uthreads.c` — Implementation
+- `include/uthreads.h` — API header with comments
+- `src/main.c` — Demo/test program
+- *(Optional)* `src/uthreads.demo.c` — Another test/demo
+- `README.md`
 
-include/uthreads.h — API header with comments
-
-src/main.c — Demo/test program
-
-(Optional) src/uthreads.demo.c — Another test/demo
